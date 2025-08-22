@@ -1,13 +1,22 @@
 import frappe
-from frappe import _
+
+
 @frappe.whitelist()
-def emit_message(message):
-    """Emit a message to the desk UI."""
+def emit_message(message, user=None, show_msgprint=True):
+   
     import frappe
     from frappe import _
 
-    # Emit the message event
-    frappe.publish_realtime('custom_app/message', {'message': message})
+    target_user = user or getattr(frappe.local, 'session', {}).get('user') or None
+    event = {
+        'message': message,
+    }
 
-    # Show a popup notification
-    frappe.msgprint(_(message))
+    if target_user:
+        frappe.publish_realtime('custom_app_event', event, user=target_user)
+    else:
+        frappe.publish_realtime('custom_app_event', event)
+
+    # Optional server-side msgprint for the caller
+    if show_msgprint:
+        frappe.msgprint(_(message))
