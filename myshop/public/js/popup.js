@@ -1,47 +1,43 @@
 (function() {
     'use strict';
-
-    // Add CSS styles for the popup
-    function addPopupStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .custom-app-popup {
-                position: fixed;
-                right: 20px;
-                bottom: 20px;
-                background: #fff;
-                color: #333;
-                padding: 12px 16px;
-                box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-                z-index: 99999;
-                border-radius: 6px;
-                max-width: 360px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                line-height: 1.4;
-                border-left: 4px solid #2490ef;
-                animation: customAppPopupFadeIn 0.3s ease;
-            }
-            @keyframes customAppPopupFadeIn {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    
+    console.log('Custom app JS loaded successfully!');
+    
+    // Add CSS for local popup
+    const style = document.createElement('style');
+    style.textContent = `
+        .custom-app-popup {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: #fff;
+            color: #333;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100000;
+            border-radius: 4px;
+            max-width: 300px;
+            border: 1px solid #d1d8dd;
+            border-left: 4px solid #5e64ff;
+        }
+    `;
+    document.head.appendChild(style);
 
     function showLocalPopup(message, title) {
+        console.log('Showing local popup:', title, message);
+        
         const popup = document.createElement('div');
         popup.className = 'custom-app-popup';
         
         if (title) {
-            const titleEl = document.createElement('strong');
-            titleEl.textContent = title + ': ';
-            titleEl.style.display = 'block';
+            const titleEl = document.createElement('div');
+            titleEl.textContent = title;
+            titleEl.style.fontWeight = 'bold';
             titleEl.style.marginBottom = '5px';
             popup.appendChild(titleEl);
         }
         
-        const messageEl = document.createElement('span');
+        const messageEl = document.createElement('div');
         messageEl.textContent = message || '';
         popup.appendChild(messageEl);
         
@@ -55,9 +51,9 @@
     }
 
     function showIntrusivePopup(message, title) {
+        console.log('Showing intrusive popup:', title, message);
         try {
             if (window.frappe && typeof frappe.msgprint === 'function') {
-                // Use Desk's intrusive msgprint for a modal-like notification
                 frappe.msgprint({
                     title: title || 'Notification',
                     message: message || '',
@@ -67,55 +63,47 @@
                 showLocalPopup(message, title);
             }
         } catch (e) {
-            // Fallback
+            console.error('Error showing intrusive popup:', e);
             showLocalPopup(message, title);
         }
     }
 
     function onEvent(data) {
+        console.log('Event received:', data);
         if (!data) {
-            console.warn('custom_app: received empty event data');
+            console.warn('Empty event data received');
             return;
         }
         
-        var msg = data.message || '';
-        var title = data.title || 'Notification';
+        const msg = data.message || '';
+        const title = data.title || 'Notification';
         showIntrusivePopup(msg, title);
     }
 
-    function subscribe() {
-        try {
-            if (window.frappe && window.frappe.realtime && typeof frappe.realtime.on === 'function') {
-                // subscribe once; server should publish to 'custom_app_event'
-                frappe.realtime.on('custom_app_event', function(data) {
-                    onEvent(data);
-                });
-                console.log('custom_app: subscribed to realtime events');
-            } else {
-                console.warn('custom_app: frappe.realtime not available; realtime subscriptions disabled');
-            }
-        } catch (e) {
-            console.warn('custom_app: realtime subscribe failed', e);
-        }
-    }
-
-    // Initialize when DOM is ready
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        addPopupStyles();
-        subscribe();
-    } else {
-        document.addEventListener('DOMContentLoaded', function() {
-            addPopupStyles();
-            subscribe();
+    // Subscribe to events
+    console.log('Setting up realtime listener for custom_app_event');
+    
+    if (window.frappe && window.frappe.realtime && typeof frappe.realtime.on === 'function') {
+        frappe.realtime.on('custom_app_event', function(data) {
+            console.log('custom_app_event received:', data);
+            onEvent(data);
         });
+        console.log('Successfully subscribed to custom_app_event');
+    } else {
+        console.warn('Frappe realtime not available');
     }
 
-    // expose test hook for manual testing from console:
-    window.__custom_app_on_event = onEvent;
+    // Make functions available globally for testing
+    window.showLocalPopup = showLocalPopup;
+    window.showIntrusivePopup = showIntrusivePopup;
+    window.onEvent = onEvent;
     window.__custom_app_test = function() {
         onEvent({
             message: 'Test message from console',
             title: 'Test Notification'
         });
     };
+
+    console.log('Custom app initialization complete');
+
 })();
