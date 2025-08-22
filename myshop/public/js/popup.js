@@ -1,25 +1,52 @@
 (function() {
     'use strict';
 
-    function showLocalPopup(message) {
+    // Add CSS styles for the popup
+    function addPopupStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .custom-app-popup {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                background: #fff;
+                color: #333;
+                padding: 12px 16px;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+                z-index: 99999;
+                border-radius: 6px;
+                max-width: 360px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.4;
+                border-left: 4px solid #2490ef;
+                animation: customAppPopupFadeIn 0.3s ease;
+            }
+            @keyframes customAppPopupFadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    function showLocalPopup(message, title) {
         const popup = document.createElement('div');
         popup.className = 'custom-app-popup';
-        popup.innerText = message || '';
-        Object.assign(popup.style, {
-            position: 'fixed',
-            right: '20px',
-            bottom: '20px',
-            background: '#fff',
-            color: '#111',
-            padding: '12px 16px',
-            boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
-            zIndex: 99999,
-            borderRadius: '6px',
-            maxWidth: '360px',
-            fontFamily: 'inherit',
-            lineHeight: '1.3',
-        });
+        
+        if (title) {
+            const titleEl = document.createElement('strong');
+            titleEl.textContent = title + ': ';
+            titleEl.style.display = 'block';
+            titleEl.style.marginBottom = '5px';
+            popup.appendChild(titleEl);
+        }
+        
+        const messageEl = document.createElement('span');
+        messageEl.textContent = message || '';
+        popup.appendChild(messageEl);
+        
         document.body.appendChild(popup);
+        
         setTimeout(function() {
             if (popup.parentNode) {
                 popup.parentNode.removeChild(popup);
@@ -37,17 +64,22 @@
                     indicator: 'blue'
                 });
             } else {
-                showLocalPopup(message);
+                showLocalPopup(message, title);
             }
         } catch (e) {
             // Fallback
-            showLocalPopup(message);
+            showLocalPopup(message, title);
         }
     }
 
     function onEvent(data) {
-        var msg = (data && data.message) ? data.message : '';
-        var title = (data && data.title) ? data.title : 'Notification';
+        if (!data) {
+            console.warn('custom_app: received empty event data');
+            return;
+        }
+        
+        var msg = data.message || '';
+        var title = data.title || 'Notification';
         showIntrusivePopup(msg, title);
     }
 
@@ -58,6 +90,7 @@
                 frappe.realtime.on('custom_app_event', function(data) {
                     onEvent(data);
                 });
+                console.log('custom_app: subscribed to realtime events');
             } else {
                 console.warn('custom_app: frappe.realtime not available; realtime subscriptions disabled');
             }
@@ -66,12 +99,23 @@
         }
     }
 
+    // Initialize when DOM is ready
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        addPopupStyles();
         subscribe();
     } else {
-        document.addEventListener('DOMContentLoaded', subscribe);
+        document.addEventListener('DOMContentLoaded', function() {
+            addPopupStyles();
+            subscribe();
+        });
     }
 
     // expose test hook for manual testing from console:
     window.__custom_app_on_event = onEvent;
+    window.__custom_app_test = function() {
+        onEvent({
+            message: 'Test message from console',
+            title: 'Test Notification'
+        });
+    };
 })();
