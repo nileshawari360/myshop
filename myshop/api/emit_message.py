@@ -1,3 +1,6 @@
+import frappe
+from frappe import _
+@frappe.whitelist()
 def emit_message(message):
     """Emit a message to the desk UI."""
     import frappe
