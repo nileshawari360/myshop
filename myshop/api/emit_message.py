@@ -25,7 +25,7 @@ def emit_message(message, user=None, show_msgprint=True, title="Notification"):
         frappe.publish_realtime('custom_app_event', event)
 
     # Optional server-side msgprint for the caller
-    if show_msgprint:
-        frappe.msgprint(_(message))
+    # if show_msgprint:
+    #     frappe.msgprint(_(message))
         
     return {"success": True, "message": "Event emitted"}
