@@ -1,3 +1,6 @@
+import frappe
+from frappe import _
+@frappe.whitelist()
 def broadcast_event(message, action_type, user=None):
     import frappe
     from frappe import _
