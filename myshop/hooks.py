@@ -26,8 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/myshop/css/myshop.css"
-app_include_js = ["/assets/myshop/js/popup.js", "/assets/myshop/js/webpushr.js", "/assets/myshop/js/floating_icon.js"]
-static_web_path = ['/assets/myshop/webpushr-sw.js']
+app_include_js = ["/assets/myshop/js/popup.js", "/assets/myshop/js/floating_icon.js"]
 # include js, css files in header of web template
 # web_include_css = "/assets/myshop/css/myshop.css"
 # web_include_js = "/assets/myshop/js/myshop.js"
