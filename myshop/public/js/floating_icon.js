@@ -1,4 +1,4 @@
-frappe.ready(function() {
+$(document).ready(function() {
     // Only add once
     if (document.getElementById('custom-floating-icon')) return;
 
