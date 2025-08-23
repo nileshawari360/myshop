@@ -12,4 +12,4 @@
     fjs.parentNode.insertBefore(js, fjs);
 }(window, document, 'script', 'webpushr-jssdk'));
 
-webpushr('init', 'BNKg0AqNQRNSlIPjt16El68UHLLCvRhuC0jvpbGG98MCSaewvTPlB24Bb4PS0xngzUl76CpAfxJLmK7-JwWtU0k');
+webpushr('setup', 'BNKg0AqNQRNSlIPjt16El68UHLLCvRhuC0jvpbGG98MCSaewvTPlB24Bb4PS0xngzUl76CpAfxJLmK7-JwWtU0k');
