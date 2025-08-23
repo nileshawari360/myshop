@@ -27,6 +27,6 @@ $(document).ready(function() {
 
     // On click: show Hello World message
     btn.addEventListener('click', function() {
-        frappe.msgprint(__('Hello World'));
+        frappe.msgprint(__('Hello World.. have a Fun'));
     });
 });
