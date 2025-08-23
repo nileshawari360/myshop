@@ -9,6 +9,10 @@ frappe.realtime.on('my_custom_event', function(data) {
     }, 5);
 });
 
+frappe.realtime.socket.on("custom_app_hello_response", function(data) {
+    frappe.msgprint(data.message);
+});
+
 // Optional: Check if realtime is available
 if (typeof frappe !== 'undefined' && frappe.realtime) {
     console.log("Realtime system available");
