@@ -6,11 +6,10 @@ def emit_custom_event(user=None, message="Hello"):
         print(f"Message: {message}")
         
         frappe.publish_realtime(
-            event='my_custom_event',
-            message={'msg': message},
-            user=user or frappe.session.user,
-            after_commit=True  # Add this to ensure it fires after commit
+            'my_custom_event',           # event name (positional)
+            {'message': "hello world"}            # data (positional)
         )
+
         
         print("Event published successfully")
         return {"status": "success", "message": "Event emitted successfully"}
