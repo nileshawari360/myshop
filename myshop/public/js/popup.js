@@ -1,28 +1,20 @@
-frappe.ready(function() {
-    // Wait a bit to ensure realtime is fully initialized
-    setTimeout(function() {
-        frappe.realtime.on('my_custom_event', function(data) {
-            console.log("Custom Event Received:", data);
-            
-            // Show alert popup
-            frappe.show_alert({
-                message: data.msg || "Notification received",
-                indicator: 'green'
-            }, 5);
-            
-            // Optional: Show a dialog for more important messages
-            if (data.important) {
-                frappe.msgprint({
-                    title: __('Notification'),
-                    indicator: 'green',
-                    message: data.msg
-                });
-            }
-        });
-        
-        console.log("Custom event listener registered");
-    }, 5000);
+// This is the safest for Desk applications
+frappe.realtime.on('my_custom_event', function(data) {
+    console.log("Custom event received:", data);
+    
+    // Show alert popup
+    frappe.show_alert({
+        message: data.message?.msg || data.message || data.msg || "Notification",
+        indicator: data.type === 'error' ? 'red' : 'green'
+    }, 5);
 });
+
+// Optional: Check if realtime is available
+if (typeof frappe !== 'undefined' && frappe.realtime) {
+    console.log("Realtime system available");
+} else {
+    console.warn("Frappe realtime not available");
+}
 
 
 // (function() {
