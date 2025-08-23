@@ -1,15 +1,28 @@
-
 import frappe
 
 @frappe.whitelist(allow_guest=True)
 def emit_custom_event(user=None, message="Hello"):
-    # Trigger event "my_custom_event" to a user or broadcast
-    frappe.publish_realtime(
-        event='my_custom_event',       # Event name
-        message={'msg': message},      # Payload
-        user=user or frappe.session.user  # Optional: Send to specific user
-    )
-    return {"status": "Event emitted"}
+    try:
+        # Trigger event "my_custom_event" to a user or broadcast
+        frappe.publish_realtime(
+            event='my_custom_event',       # Event name
+            message={'msg': message},      # Payload
+            user=user or frappe.session.user  # Optional: Send to specific user
+        )
+        return {"status": "success", "message": "Event emitted successfully"}
+        
+    except Exception as e:
+        # Log the error in frappe.error
+        frappe.log_error(
+            title="Error in emit_custom_event",
+            message=f"Error: {str(e)}\nUser: {user}\nMessage: {message}"
+        )
+        
+        # Return error response
+        return {
+            "status": "error",
+            "message": f"Failed to emit event: {str(e)}"
+        }
 
 # @frappe.whitelist()
 # def emit_message(message, user=None, show_msgprint=True, title="Notification"):
