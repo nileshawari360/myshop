@@ -10,9 +10,6 @@ def emit_custom_event(user=None, message="Hello"):
             {'message': "hello world"}            # data (positional)
         )
 
-		socket.emit("custom_app_hello_response", { message: "Hello from server!", received: data });
-
-        
         print("Event published successfully")
         return {"status": "success", "message": "Event emitted successfully"}
         
