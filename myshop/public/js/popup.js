@@ -1,12 +1,27 @@
-$(document).ready(function() {
-    // Attach the realtime event listener after Desk has loaded
-    frappe.realtime.on('my_custom_event', (data) => {
-        console.log("Custom Event Received:", data);
-        frappe.show_alert({
-            message: data.msg,
-            indicator: 'green'
+frappe.ready(function() {
+    // Wait a bit to ensure realtime is fully initialized
+    setTimeout(function() {
+        frappe.realtime.on('my_custom_event', function(data) {
+            console.log("Custom Event Received:", data);
+            
+            // Show alert popup
+            frappe.show_alert({
+                message: data.msg || "Notification received",
+                indicator: 'green'
+            }, 5);
+            
+            // Optional: Show a dialog for more important messages
+            if (data.important) {
+                frappe.msgprint({
+                    title: __('Notification'),
+                    indicator: 'green',
+                    message: data.msg
+                });
+            }
         });
-    });
+        
+        console.log("Custom event listener registered");
+    }, 5000);
 });
 
 
